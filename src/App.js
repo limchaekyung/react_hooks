@@ -2,29 +2,35 @@ import React, {useState} from "react"
 import logo from './logo.svg';
 import './App.css';
 
-const useInput = (initialValue, validator) => {
-  const [value, setValue] = useState(initialValue);
-  const onChange = event => {
-    const {
-      target: {value}
-    } = event;
-    let WillUpdate = true;
-    if(typeof validator === "function"){
-      WillUpdate = validator(value);
-    }
-    if(WillUpdate){
-      setValue(value);
-    }
+const content = [
+  {
+    tab: "Section 1",
+    content: "I'm the content of the Sectin 1"
+  },
+  {
+    tab: "Section 2",
+    content: "I'm the content of the Sectin 2"
   }
-  return {value, onChange};
+];
+const useTabs = (initialTab, allTabs) => {
+  const [currentIndex, setCurrentIndex] = useState(initialTab);
+  if(!allTabs || !Array.isArray(allTabs)){
+    return;
+  }
+  return{
+    currentItem: allTabs[currentIndex],
+    changeItem: setCurrentIndex
+  }
 }
+
 const App = () =>{
-  const maxLen = (value) => !value.includes("@");  //true return
-  const name = useInput("Mr.", maxLen);
+  const {currentItem, changeItem} = useTabs(0, content);
   return (
     <div className="App">
-      <h1>Hello</h1>
-      <input placeholder="Name" /* value={name.value} */ {...name}/>
+      {content.map((section, index) => (
+        <button onClick={() => changeItem(index)}>{section.tab}</button>
+      ))}
+      <div>{currentItem.content}</div>
     </div>
   );
 }
