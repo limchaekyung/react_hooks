@@ -1,36 +1,30 @@
-import React, {useState} from "react"
+import React, {useState, useEffect, useRef} from "react"
 import logo from './logo.svg';
 import './App.css';
 
-const content = [
-  {
-    tab: "Section 1",
-    content: "I'm the content of the Sectin 1"
-  },
-  {
-    tab: "Section 2",
-    content: "I'm the content of the Sectin 2"
-  }
-];
-const useTabs = (initialTab, allTabs) => {
-  const [currentIndex, setCurrentIndex] = useState(initialTab);
-  if(!allTabs || !Array.isArray(allTabs)){
-    return;
-  }
-  return{
-    currentItem: allTabs[currentIndex],
-    changeItem: setCurrentIndex
-  }
-}
-
+const useClick = (onClick) => {
+  const element = useRef();
+  useEffect(() => {
+    if(typeof onClick !== "function"){
+      return;
+    }
+    if (element.current) {
+      element.current.addEventListener("click", onClick);
+    }
+    return () => {
+      if (element.current) {
+        element.current.removeEventListener("click", onClick);
+      }
+    };
+  }, []);
+  return element;
+};
 const App = () =>{
-  const {currentItem, changeItem} = useTabs(0, content);
+  const sayHello = () => console.log("say hello");
+  const title = useClick(sayHello);
   return (
     <div className="App">
-      {content.map((section, index) => (
-        <button onClick={() => changeItem(index)}>{section.tab}</button>
-      ))}
-      <div>{currentItem.content}</div>
+      <h1 ref={title}>Hi</h1>
     </div>
   );
 }
