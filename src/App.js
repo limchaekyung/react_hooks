@@ -2,29 +2,29 @@ import React, {useState, useEffect, useRef} from "react"
 import logo from './logo.svg';
 import './App.css';
 
-const useClick = (onClick) => {
-  const element = useRef();
-  useEffect(() => {
-    if(typeof onClick !== "function"){
-      return;
+const useConfirm = (message = "", onConfirm, onCancel) => {
+  if(!onConfirm || typeof onConfirm !== "function"){
+    return;
+  }
+  if(onCancel && typeof onCancel !== "function"){
+    return;
+  }
+  const confirmAction = () => {
+    if(window.confirm(message)){
+      onConfirm();
+    }else{
+      onCancel();
     }
-    if (element.current) {
-      element.current.addEventListener("click", onClick);
-    }
-    return () => {
-      if (element.current) {
-        element.current.removeEventListener("click", onClick);
-      }
-    };
-  }, []);
-  return element;
-};
+  }
+  return confirmAction;
+}
 const App = () =>{
-  const sayHello = () => console.log("say hello");
-  const title = useClick(sayHello);
+  const deleteWorld = () => console.log("Deleting the word");
+  const abort = () => console.log("Aborted");
+  const confirmDelete = useConfirm("Are you sure", deleteWorld, abort);
   return (
     <div className="App">
-      <h1 ref={title}>Hi</h1>
+      <button onClick={confirmDelete}>Delete the world</button>
     </div>
   );
 }
