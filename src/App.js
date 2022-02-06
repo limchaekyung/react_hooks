@@ -2,29 +2,32 @@ import React, {useState, useEffect, useRef} from "react"
 import logo from './logo.svg';
 import './App.css';
 
-const useConfirm = (message = "", onConfirm, onCancel) => {
-  if(!onConfirm || typeof onConfirm !== "function"){
-    return;
-  }
-  if(onCancel && typeof onCancel !== "function"){
-    return;
-  }
-  const confirmAction = () => {
-    if(window.confirm(message)){
-      onConfirm();
-    }else{
-      onCancel();
+const useNetwork = onChange => {
+    const [status, setStatus] = useState(navigator.onLine);
+    const handleChange = () => {
+        if(typeof onChange === "function") {
+            onChange(navigator.onLine)
+        }
+        setStatus(navigator.onLine);
     }
-  }
-  return confirmAction;
+    useEffect(() => {
+        window.addEventListener("online", handleChange);
+        window.addEventListener("offline", handleChange);
+    },
+        () => {
+            window.removeEventListener("online", handleChange);
+            window.removeEventListener("offline", handleChange);
+        }, []);
+    return status;
 }
 const App = () =>{
-  const deleteWorld = () => console.log("Deleting the word");
-  const abort = () => console.log("Aborted");
-  const confirmDelete = useConfirm("Are you sure", deleteWorld, abort);
+    const handleNetworkChange = (online) => {
+        console.log(online ? "We just went online": "We are offline")
+    }
+  const online = useNetwork(handleNetworkChange);
   return (
     <div className="App">
-      <button onClick={confirmDelete}>Delete the world</button>
+      <h1>{online ? "Online" : "Offline"}</h1>
     </div>
   );
 }
