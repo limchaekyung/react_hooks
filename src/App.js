@@ -1,35 +1,20 @@
 import React, {useState, useEffect, useRef} from "react"
 import logo from './logo.svg';
 import './App.css';
+import useAxios from "./hooks/useAxios"
 
-const useNetwork = onChange => {
-    const [status, setStatus] = useState(navigator.onLine);
-    const handleChange = () => {
-        if(typeof onChange === "function") {
-            onChange(navigator.onLine)
-        }
-        setStatus(navigator.onLine);
-    }
-    useEffect(() => {
-        window.addEventListener("online", handleChange);
-        window.addEventListener("offline", handleChange);
-    },
-        () => {
-            window.removeEventListener("online", handleChange);
-            window.removeEventListener("offline", handleChange);
-        }, []);
-    return status;
-}
 const App = () =>{
-    const handleNetworkChange = (online) => {
-        console.log(online ? "We just went online": "We are offline")
-    }
-  const online = useNetwork(handleNetworkChange);
-  return (
-    <div className="App">
-      <h1>{online ? "Online" : "Offline"}</h1>
-    </div>
-  );
+    const { loading, data, error, refetch } = useAxios({
+      url: "https://yts.mx/api/v2/list_movies.json",
+    });
+    
+    return (
+      <div className="App">
+        <h1>{data && data.status}</h1>
+        <h2>{loading && "loading"}</h2>
+        <button onClick={refetch}>Refetch</button>
+      </div>
+    );
 }
 
 export default App;
